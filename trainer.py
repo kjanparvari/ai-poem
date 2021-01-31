@@ -9,11 +9,14 @@ class Vocabulary:
     def __init__(self):
         self._dict = {}
         self._generate()
-        # print(len(self._dict))
+        print(len(self._dict))
         self._filter()
-        # print(len(self._dict))
+        print(len(self._dict))
         from model import Model
-        ferdowsi_model = Model(self, FERDOWSI_TRAIN_FILENAME)
+        ferdowsi_model = Model("ferdowsi", self, FERDOWSI_TRAIN_FILENAME)
+        hafez_model = Model("hafez", self, HAFEZ_TRAIN_FILENAME)
+        molavi_model = Model("molavi", self, MOLAVI_TRAIN_FILENAME)
+        self._save()
 
     def _add(self, lst: [str]):
         word: str
@@ -25,16 +28,16 @@ class Vocabulary:
 
     def _generate(self):
         tokens: [(str, int)]
-        with open(FERDOWSI_TRAIN_FILENAME, "r+", encoding='utf-8') as file:
-            tokens = tokenize(file.read())
+        with open(FERDOWSI_TRAIN_FILENAME, "r", encoding='utf-8') as file:
+            tokens = file.read().strip().split()
             file.close()
         self._add(tokens)
-        with open(HAFEZ_TRAIN_FILENAME, "r+", encoding='utf-8') as file:
-            tokens = tokenize(file.read())
+        with open(HAFEZ_TRAIN_FILENAME, "r", encoding='utf-8') as file:
+            tokens = file.read().strip().split()
             file.close()
         self._add(tokens)
-        with open(MOLAVI_TRAIN_FILENAME, "r+", encoding='utf-8') as file:
-            tokens = tokenize(file.read())
+        with open(MOLAVI_TRAIN_FILENAME, "r", encoding='utf-8') as file:
+            tokens = file.read().strip().split()
             file.close()
         self._add(tokens)
 
@@ -52,15 +55,11 @@ class Vocabulary:
         else:
             return False
 
-
-def tokenize(text: str) -> [(str, int)]:  # returns list of (term, position)
-    result: [(str, int)] = []
-    lst: list = text.strip().split()
-    word: str
-    for word in lst:
-        if word != "":
-            result.append(word)
-    return result
+    def _save(self):
+        import pickle
+        with open("./dist/vocabulary.kj", "wb") as file:
+            pickle.dump(self._dict, file)
+            file.close()
 
 
 def main():
